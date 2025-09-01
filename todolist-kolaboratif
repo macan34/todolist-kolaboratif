@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TodoList Kolaboratif</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            padding: 20px;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .user-section {
+            padding: 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .user-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .user-input input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .user-input input:focus {
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #666;
+            border: 2px solid #e0e0e0;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+        }
+
+        .current-user {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            padding: 10px 15px;
+            border-radius: 15px;
+            text-align: center;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .groups-section {
+            padding: 20px;
+        }
+
+        .group-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .group-controls input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .groups-list {
+            display: grid;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .group-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .group-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .group-item.active {
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+            color: white;
+        }
+
+        .group-info h4 {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .group-info p {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .btn-danger {
+            background: #ff6b6b;
+            color: white;
+            padding: 8px 12px;
+            font-size: 12px;
+        }
+
+        .todos-section {
+            padding: 20px;
+            background: #f8f9fa;
+            min-height: 300px;
+        }
+
+        .todo-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .todo-input input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 14px;
+        }
+
+        .todos-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .todo-item {
+            background: white;
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .todo-item.completed {
+            opacity: 0.6;
+            text-decoration: line-through;
+        }
+
+        .todo-checkbox {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid #4facfe;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .todo-checkbox.checked {
+            background: #4facfe;
+        }
+
+        .todo-checkbox.checked::after {
+            content: '✓';
+            color: white;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 12px;
+        }
+
+        .todo-text {
+            flex: 1;
+            font-size: 14px;
+        }
+
+        .todo-author {
+            font-size: 12px;
+            color: #666;
+            background: #e9ecef;
+            padding: 5px 10px;
+            border-radius: 10px;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #666;
+            padding: 40px 20px;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 10px;
+        }
+
+        /* Mobile optimizations */
+        @media (max-width: 480px) {
+            .container {
+                margin: 0;
+                border-radius: 0;
+                min-height: 100vh;
+            }
+            
+            .user-input, .group-controls, .todo-input {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📝 TodoList Kolaboratif</h1>
+            <p>Kelola tugas bersama tim dengan mudah</p>
+        </div>
+
+        <div class="user-section">
+            <div class="user-input" id="userInput">
+                <input type="text" id="usernameInput" placeholder="Masukkan nama Anda..." maxlength="20">
+                <button class="btn btn-primary" onclick="setUser()">Masuk</button>
+            </div>
+            <div class="current-user" id="currentUser" style="display: none;">
+                <span id="userName"></span>
+            </div>
+        </div>
+
+        <div class="groups-section">
+            <div class="group-controls">
+                <input type="text" id="groupNameInput" placeholder="Nama kelompok baru..." maxlength="30">
+                <button class="btn btn-primary" onclick="createGroup()">Buat</button>
+            </div>
+            
+            <div class="groups-list" id="groupsList">
+                <!-- Groups will be added here -->
+            </div>
+        </div>
+
+        <div class="todos-section">
+            <div class="todo-input">
+                <input type="text" id="todoInput" placeholder="Tambah tugas baru..." maxlength="100">
+                <button class="btn btn-primary" onclick="addTodo()">Tambah</button>
+            </div>
+            
+            <div class="todos-list" id="todosList">
+                <div class="empty-state">
+                    <h3>🎯 Pilih kelompok untuk memulai</h3>
+                    <p>Buat kelompok baru atau pilih yang sudah ada</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data storage in memory (simulating shared state)
+        let currentUser = '';
+        let currentGroup = '';
+        let groups = {};
+        let todos = {};
+
+        // Initialize with sample data
+        function initSampleData() {
+            groups = {
+                'tim-project': {
+                    name: 'Tim Project',
+                    members: ['Admin', 'User1', 'User2'],
+                    created: new Date().toISOString()
+                },
+                'keluarga': {
+                    name: 'Keluarga',
+                    members: ['Admin'],
+                    created: new Date().toISOString()
+                }
+            };
+
+            todos = {
+                'tim-project': [
+                    {
+                        id: '1',
+                        text: 'Review kode program',
+                        completed: false,
+                        author: 'Admin',
+                        timestamp: new Date().toISOString()
+                    },
+                    {
+                        id: '2',
+                        text: 'Update dokumentasi',
+                        completed: true,
+                        author: 'User1',
+                        timestamp: new Date().toISOString()
+                    }
+                ],
+                'keluarga': [
+                    {
+                        id: '3',
+                        text: 'Belanja bulanan',
+                        completed: false,
+                        author: 'Admin',
+                        timestamp: new Date().toISOString()
+                    }
+                ]
+            };
+        }
+
+        function setUser() {
+            const username = document.getElementById('usernameInput').value.trim();
+            if (!username) {
+                alert('Silakan masukkan nama Anda');
+                return;
+            }
+
+            currentUser = username;
+            document.getElementById('userName').textContent = `👤 ${currentUser}`;
+            document.getElementById('userInput').style.display = 'none';
+            document.getElementById('currentUser').style.display = 'block';
+            
+            renderGroups();
+        }
+
+        function createGroup() {
+            if (!currentUser) {
+                alert('Silakan masuk terlebih dahulu');
+                return;
+            }
+
+            const groupName = document.getElementById('groupNameInput').value.trim();
+            if (!groupName) {
+                alert('Silakan masukkan nama kelompok');
+                return;
+            }
+
+            const groupId = groupName.toLowerCase().replace(/\s+/g, '-');
+            
+            if (groups[groupId]) {
+                alert('Kelompok sudah ada');
+                return;
+            }
+
+            groups[groupId] = {
+                name: groupName,
+                members: [currentUser],
+                created: new Date().toISOString()
+            };
+
+            todos[groupId] = [];
+
+            document.getElementById('groupNameInput').value = '';
+            renderGroups();
+        }
+
+        function selectGroup(groupId) {
+            currentGroup = groupId;
+            
+            // Add current user to group if not already a member
+            if (!groups[groupId].members.includes(currentUser)) {
+                groups[groupId].members.push(currentUser);
+            }
+            
+            renderGroups();
+            renderTodos();
+        }
+
+        function deleteGroup(groupId, event) {
+            event.stopPropagation();
+            
+            if (confirm('Hapus kelompok ini?')) {
+                delete groups[groupId];
+                delete todos[groupId];
+                
+                if (currentGroup === groupId) {
+                    currentGroup = '';
+                }
+                
+                renderGroups();
+                renderTodos();
+            }
+        }
+
+        function renderGroups() {
+            const groupsList = document.getElementById('groupsList');
+            groupsList.innerHTML = '';
+
+            Object.keys(groups).forEach(groupId => {
+                const group = groups[groupId];
+                const groupElement = document.createElement('div');
+                groupElement.className = `group-item ${currentGroup === groupId ? 'active' : ''}`;
+                groupElement.onclick = () => selectGroup(groupId);
+
+                groupElement.innerHTML = `
+                    <div class="group-info">
+                        <h4>${group.name}</h4>
+                        <p>${group.members.length} anggota</p>
+                    </div>
+                    <button class="btn btn-danger" onclick="deleteGroup('${groupId}', event)">Hapus</button>
+                `;
+
+                groupsList.appendChild(groupElement);
+            });
+        }
+
+        function addTodo() {
+            if (!currentUser) {
+                alert('Silakan masuk terlebih dahulu');
+                return;
+            }
+
+            if (!currentGroup) {
+                alert('Silakan pilih kelompok terlebih dahulu');
+                return;
+            }
+
+            const todoText = document.getElementById('todoInput').value.trim();
+            if (!todoText) {
+                alert('Silakan masukkan tugas');
+                return;
+            }
+
+            const todoId = Date.now().toString();
+            const newTodo = {
+                id: todoId,
+                text: todoText,
+                completed: false,
+                author: currentUser,
+                timestamp: new Date().toISOString()
+            };
+
+            if (!todos[currentGroup]) {
+                todos[currentGroup] = [];
+            }
+
+            todos[currentGroup].unshift(newTodo);
+            document.getElementById('todoInput').value = '';
+            renderTodos();
+        }
+
+        function toggleTodo(todoId) {
+            if (!todos[currentGroup]) return;
+
+            const todo = todos[currentGroup].find(t => t.id === todoId);
+            if (todo) {
+                todo.completed = !todo.completed;
+                renderTodos();
+            }
+        }
+
+        function renderTodos() {
+            const todosList = document.getElementById('todosList');
+
+            if (!currentGroup) {
+                todosList.innerHTML = `
+                    <div class="empty-state">
+                        <h3>🎯 Pilih kelompok untuk memulai</h3>
+                        <p>Buat kelompok baru atau pilih yang sudah ada</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const groupTodos = todos[currentGroup] || [];
+
+            if (groupTodos.length === 0) {
+                todosList.innerHTML = `
+                    <div class="empty-state">
+                        <h3>📋 Belum ada tugas</h3>
+                        <p>Tambah tugas pertama untuk kelompok ${groups[currentGroup].name}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            todosList.innerHTML = '';
+
+            groupTodos.forEach(todo => {
+                const todoElement = document.createElement('div');
+                todoElement.className = `todo-item ${todo.completed ? 'completed' : ''}`;
+
+                todoElement.innerHTML = `
+                    <div class="todo-checkbox ${todo.completed ? 'checked' : ''}" 
+                         onclick="toggleTodo('${todo.id}')"></div>
+                    <div class="todo-text">${todo.text}</div>
+                    <div class="todo-author">${todo.author}</div>
+                `;
+
+                todosList.appendChild(todoElement);
+            });
+        }
+
+        // Handle Enter key for inputs
+        document.getElementById('usernameInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') setUser();
+        });
+
+        document.getElementById('groupNameInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') createGroup();
+        });
+
+        document.getElementById('todoInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') addTodo();
+        });
+
+        // Initialize the app
+        initSampleData();
+        renderGroups();
+    </script>
+</body>
+</html>
